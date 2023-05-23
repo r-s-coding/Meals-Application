@@ -6,6 +6,18 @@ import axios from 'axios'
 const allMealsUrl = 'https://www.themealdb.com/api/json/v1/1/search.php?s='
 const randomMealUrl = 'https://www.themealdb.com/api/json/v1/1/random.php'
 
+const getFavouritesFromLocalStorage = () => {
+  let favourites = localStorage.getItem('favourites')
+  if (favourites) {
+    favourites = JSON.parse(localStorage.getItem('favourites'))
+  }
+  else {
+    favourites = []
+  }
+  return favourites
+}
+
+
 const AppProvider = ({children}) => {
   
   const [meals, setMeals] = useState([])
@@ -13,7 +25,7 @@ const AppProvider = ({children}) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [selectedMeal, setSelectedMeal] = useState(null)
-  const [favourites, setFavourites] = useState([])
+  const [favourites, setFavourites] = useState(getFavouritesFromLocalStorage())
   
   const fetchMeals = async (url) => {
     setLoading(true)
@@ -55,12 +67,13 @@ const AppProvider = ({children}) => {
     const meal = meals.find((meal) => meal.idMeal === idMeal)
     const updatedFavourites = [...favourites, meal]
     setFavourites(updatedFavourites)
+    localStorage.setItem('favourites', JSON.stringify(updatedFavourites))
   }
 
   const removeFromFavourites = (idMeal) => {
     const updatedFavourites = favourites.filter((meal) => meal.idMeal !== idMeal);
     setFavourites(updatedFavourites)
-    
+    localStorage.setItem('favourites', JSON.stringify(updatedFavourites))
   }
   
   // Can only use async/await by either creating a function inside or outside the useEffect function
